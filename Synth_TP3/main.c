@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     glutInitWindowPosition(100, 100);
     glutCreateWindow("TP OpenGL");
     glutDisplayFunc(display);
-    glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45, 1, 0.1, 100);
