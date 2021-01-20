@@ -16,9 +16,12 @@ GLuint VBOID;
 
 void display()
 {
+    glClear(GL_COLOR_BUFFER_BIT);
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBOID);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisableVertexAttribArray(0);
     glutSwapBuffers();
 }
 
@@ -30,38 +33,43 @@ void ExitFunction(int value)
 
 int main(int argc, char **argv)
 {
-    glewExperimental = TRUE;
-    glewInit();
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE); //glutInitDisplayMode(GLUT_SINGLE);
+    glutInitDisplayMode(GLUT_DOUBLE);
     glutInitWindowSize(1280, 720);
     glutInitWindowPosition(100, 100);
-
     glutInitContextVersion(3, 3);
     glutInitContextFlags(GLUT_CORE_PROFILE);
-    __glutCreateWindowWithExit("TP OpenGL", ExitFunction);
+    __glutCreateWindowWithExit("TP4 OpenGL - GLEW", ExitFunction);
+
+    glewExperimental = TRUE;
+    if(glewInit() != GLEW_OK){
+        exit(EXIT_FAILURE);
+    }
+    
+    //glutCreateWindow("TP OpenGL");
 
     glGenVertexArrays(1, &VAOID);
     glBindVertexArray(VAOID);
+
     glGenBuffers(1, &VBOID);
     glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 
     static const GLfloat g_vertex_buffer_data[] = {
-        1.0f,
-        0.0f,
-        0.0f,
-        0.0f,
-        1.0f,
-        0.0f,
-        -1.0f,
-        0.0f,
-        0.0f,
+        // first triangle
+        -0.9f, -0.5f, 0.0f,
+        -0.0f, -0.5f, 0.0f,  
+        -0.45f, 0.5f, 0.0f,  
+        // second triangle
+         0.0f, -0.5f, 0.0f,  
+         0.9f, -0.5f, 0.0f, 
+         0.45f, 0.5f, 0.0f   
     };
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
     glutDisplayFunc(display);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glutIdleFunc(display);
+    glClearColor(220.0f/255.0f, 220.0f/255.0f , 220.0f/255.0f, 0.0f);
 
     glutMainLoop();
     return (0);
