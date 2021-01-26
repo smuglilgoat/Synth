@@ -118,15 +118,20 @@ using namespace glm;
 GLuint VAOID;
 GLuint VBOID;
 GLuint programID;
+mat4 MVP;
+GLuint MatrixID;
 
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(programID);
-    glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, VBOID);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glDisableVertexAttribArray(0);
     glutSwapBuffers();
 }
@@ -161,19 +166,24 @@ int main(int argc, char **argv)
     glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 
     static const GLfloat g_vertex_buffer_data[] = {
-        // first triangle
-        -0.9f, -0.5f, 0.0f,
-        -0.0f, -0.5f, 0.0f,  
-        -0.45f, 0.5f, 0.0f,  
-        // second triangle
-         0.0f, -0.5f, 0.0f,  
-         0.9f, -0.5f, 0.0f, 
-         0.45f, 0.5f, 0.0f   
-    };
+     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   
+    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   
+     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    
+    };  
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
     programID = LoadShaders("D:\\Documents\\Code\\synth_tp\\synth_pt5\\SimpleVertexShader.vertexshader", "D:\\Documents\\Code\\synth_tp\\synth_pt5\\SimpleFragmentShader.fragmentshader");
+    mat4 Projection = perspective(radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+    mat4 View = lookAt(vec3(2,2,5),vec3(0,0,0),vec3(0,1,0) );
+    mat4 Model = mat4(1.0f);
+    Model = translate(Model,vec3(-1.0f, 0.0f, 0.0f));
+    Model = scale(Model,vec3(2.5f, 1.5f ,1.0f));
+    Model = rotate(Model,radians(45.0f),vec3(0.0f,0.0f,1.0f));
+
+    MVP = Projection * View * Model;
+    MatrixID = glGetUniformLocation(programID, "MVP");
+    
     glutDisplayFunc(display);
     glutIdleFunc(display);
     glClearColor(220.0f/255.0f, 220.0f/255.0f , 220.0f/255.0f, 0.0f);
