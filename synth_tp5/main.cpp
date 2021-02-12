@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    programID = LoadShaders("D:\\Documents\\Code\\synth_tp\\synth_pt5\\SimpleVertexShader.vertexshader", "D:\\Documents\\Code\\synth_tp\\synth_pt5\\SimpleFragmentShader.fragmentshader");
+    programID = LoadShaders("D:\\Documents\\Code\\synth_tp\\synth_tp5\\SimpleVertexShader.vertexshader", "D:\\Documents\\Code\\synth_tp\\synth_tp5\\SimpleFragmentShader.fragmentshader");
     mat4 Projection = perspective(radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
     mat4 View = lookAt(vec3(2,2,5),vec3(0,0,0),vec3(0,1,0) );
     mat4 Model = mat4(1.0f);

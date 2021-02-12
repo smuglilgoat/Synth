@@ -1,31 +1,28 @@
 #include <windows.h>
 #include <GL/glut.h>
 
-/*- Nous devons � pr�sent �crire la fonction � display �. C'est la fonction qui sera appel�e �
-chaque fois que la fen�tre sera rafra�chie.*/
-
 void display()
 {
-    glClear(GL_COLOR_BUFFER_BIT );
+    glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(0.0f, 1.0f, 0.0f);
     glBegin(GL_QUADS);
-    glVertex2f(-1.0f, 0.0f);    
-    glVertex2f(1.0f, 0.0f);    
-    glVertex2f(1.0f, -1.0f);    
-    glVertex2f(-1.0f, -1.0f);    
+    glVertex2f(-1.0f, 0.0f);
+    glVertex2f(1.0f, 0.0f);
+    glVertex2f(1.0f, -1.0f);
+    glVertex2f(-1.0f, -1.0f);
     glEnd();
     glColor3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_TRIANGLES);
-    glVertex2f(0.0f, 0.75f);    
-    glVertex2f(-0.5f, 0.25f);   
-    glVertex2f(0.5f, 0.25f); 
+    glVertex2f(0.0f, 0.75f);
+    glVertex2f(-0.5f, 0.25f);
+    glVertex2f(0.5f, 0.25f);
     glEnd();
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_QUADS);
-    glVertex2f(-0.5f, 0.25f);  
-    glVertex2f(0.5f, 0.25f);  
-    glVertex2f(0.5f, -0.25f);      
-    glVertex2f(-0.5f, -0.25f);       
+    glVertex2f(-0.5f, 0.25f);
+    glVertex2f(0.5f, 0.25f);
+    glVertex2f(0.5f, -0.25f);
+    glVertex2f(-0.5f, -0.25f);
     glEnd();
     glFlush();
 }
