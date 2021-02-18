@@ -8,24 +8,24 @@
 			"args": [
 				// GLAD GLFW
 
-				// "-o",
-				// "${fileDirname}\\${fileBasenameNoExtension}.exe",
-				// "${file}",
-				// "${fileDirname}\\glad.c",
-				// "-lopengl32",
-				// "-lglfw3",
-				// "-lgdi32"
+				"-o",
+				"${fileDirname}\\${fileBasenameNoExtension}.exe",
+				"${file}",
+				"${fileDirname}\\glad.c",
+				"-lopengl32",
+				"-lglfw3",
+				"-lgdi32"
 
 				// FREEGLUT GLEW
-				"-g",
-                "${file}",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "-lglew32s",
-                "-lfreeglut",
-                "-lfreeglut_static",
-                "-lopengl32",
-                "-lglu32"
+				// "-g",
+                // "${file}",
+                // "-o",
+                // "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                // "-lglew32s",
+                // "-lfreeglut",
+                // "-lfreeglut_static",
+                // "-lopengl32",
+                // "-lglu32"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

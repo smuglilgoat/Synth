@@ -1,5 +1,3 @@
-#define GLEW_STATIC
-
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -7,8 +5,8 @@
 #include <fstream>
 #include <algorithm>
 
-#include <GL/glew.h>
-#include <GL/freeglut.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -19,214 +17,115 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <cstddef>
-#include "shader.hpp"
+#include "shader_m.h"
 #include "math.h"
 
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void processInput(GLFWwindow *window);
+static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 int diffX, diffY, xOld, yOld;
 
-using namespace std;
-
-GLuint LoadShaders(const char *vertex_file_path, const char *fragment_file_path)
-{
-
-    // Create the shaders
-    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Read the Vertex Shader code from the file
-    std::string VertexShaderCode;
-    std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-    if (VertexShaderStream.is_open())
-    {
-        std::string Line = "";
-        while (getline(VertexShaderStream, Line))
-            VertexShaderCode += "\n" + Line;
-        VertexShaderStream.close();
-    }
-    else
-    {
-        printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
-        getchar();
-        return 0;
-    }
-
-    // Read the Fragment Shader code from the file
-    std::string FragmentShaderCode;
-    std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
-    if (FragmentShaderStream.is_open())
-    {
-        std::string Line = "";
-        while (getline(FragmentShaderStream, Line))
-            FragmentShaderCode += "\n" + Line;
-        FragmentShaderStream.close();
-    }
-
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-
-    // Compile Vertex Shader
-    printf("Compiling shader : %s\n", vertex_file_path);
-    char const *VertexSourcePointer = VertexShaderCode.c_str();
-    glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
-    glCompileShader(VertexShaderID);
-
-    // Check Vertex Shader
-    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-    glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0)
-    {
-        std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-        glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-        printf("%s\n", &VertexShaderErrorMessage[0]);
-    }
-
-    // Compile Fragment Shader
-    printf("Compiling shader : %s\n", fragment_file_path);
-    char const *FragmentSourcePointer = FragmentShaderCode.c_str();
-    glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
-    glCompileShader(FragmentShaderID);
-
-    // Check Fragment Shader
-    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-    glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0)
-    {
-        std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-        glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-        printf("%s\n", &FragmentShaderErrorMessage[0]);
-    }
-
-    // Link the program
-    printf("Linking program\n");
-    GLuint ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, VertexShaderID);
-    glAttachShader(ProgramID, FragmentShaderID);
-    glLinkProgram(ProgramID);
-
-    // Check the program
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0)
-    {
-        std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-        printf("%s\n", &ProgramErrorMessage[0]);
-    }
-
-    glDeleteShader(VertexShaderID);
-    glDeleteShader(FragmentShaderID);
-
-    return ProgramID;
-}
 using namespace glm;
-
-GLuint VAOID;
-GLuint VBOID;
-GLuint IBO;
-
-GLuint programID;
-mat4 MVP;
-GLuint MatrixID;
-
-mat4 Projection;
-mat4 Model;
-mat4 View;
-
-int numPoints = 20;
-
 struct STRVertex
 {
     vec3 position;
     vec3 couleur;
 };
 
-void ExitFunction(int value)
+int main()
 {
-    glDeleteBuffers(1, &VBOID);
-    glDeleteVertexArrays(1, &VAOID);
-}
+    // glfw: initialize and configure
+    // ------------------------------
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-void MouseMotion(int x, int y)
-{
-    diffX = xOld - x;
-    diffY = yOld - y;
-    glutPostRedisplay();
-    xOld = x;
-    yOld = y;
-}
-
-void KeyPressed(unsigned char touche, int x, int y)
-{
-    switch (touche)
+    // glfw window creation
+    // --------------------
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "TP OpenGL", NULL, NULL);
+    if (window == NULL)
     {
-    case 'r':
-        glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        break;
-    case 'b':
-        glClearColor(0.0f, 0.0f, 1.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        break;
-    case 'v':
-        glClearColor(0.0f, 1.0f, 0.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        break;
-    case 27: /* Escape */
-        exit(0);
-        break;
-    default:
-        glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
     }
-    glutPostRedisplay(); /// cette instruction va forcer glut à rafraîchir l’affichage.
-}
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-void display(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glUseProgram(programID);
-
-    Model = rotate(Model, radians(float(diffX)), vec3(0.0f, 0.0f, 1.0f));
-    //
-    MVP = Projection * View * Model;
-
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
-    glBindVertexArray(VAOID);
-    //  glDrawArrays(GL_TRIANGLES, 0, 18);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, numPoints + 2);
-    glBindVertexArray(0);
-
-    glutSwapBuffers();
-}
-
-int main(int argc, char **argv)
-{
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(600, 600);
-    glutInitWindowPosition(80, 100);
-    glutInitContextVersion(3, 3);
-    glutInitContextFlags(GLUT_CORE_PROFILE);
-    __glutCreateWindowWithExit("TP OpenGL", ExitFunction);
-    glewExperimental = TRUE;
-    if (glewInit())
+    // glad: load all OpenGL function pointers
+    // ---------------------------------------
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        cerr << "Unable to initialize GLEW ... exiting" << endl;
-        exit(EXIT_FAILURE);
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
     }
 
-    glGenVertexArrays(1, &VAOID);
-    glBindVertexArray(VAOID);
-    glGenBuffers(1, &VBOID);
-    glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+    // configure global opengl state
+    // -----------------------------
+    glEnable(GL_DEPTH_TEST);
 
-    ////
+    // build and compile our shader program
+    // ------------------------------------
+    Shader ourShader("D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\shader.vs", "D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\shader.fs"); // you can name your shader files however you like
+
+    // float vertices[] = {
+    //     // positions          // colors
+    //     -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+    //     0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    //     0.5f, 0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
+    //     0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
+    //     -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+    //     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+
+    //     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //     0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+    //     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //     0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+    //     -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //     -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+
+    //     -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //     -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    //     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+    //     -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
+    //     -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //     -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+
+    //     0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //     0.5f, 0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+    //     0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+    //     0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    //     0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 1.0f,
+    //     0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+
+    //     -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+    //     0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+    //     0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 1.0f,
+    //     0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+    //     -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+
+    //     -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+    //     0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
+    //     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+    //     0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+    //     -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+    //     -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f
+    // };
+    // unsigned int indices[] = {
+    //     0, 1, 3, // first triangle
+    //     1, 2, 3  // second triangle
+    // };
+
     double pi = 3.14, x, y;
     float rayon = 2;
-
+    int numPoints = 20;
     int indice = 1;
 
     STRVertex g_vertex_buffer_data[numPoints + 2];
@@ -243,36 +142,112 @@ int main(int argc, char **argv)
 
     g_vertex_buffer_data[indice] = g_vertex_buffer_data[1];
 
+    unsigned int VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36*sizeof(unsigned int), vertex_index,GL_STATIC_DRAW);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
 
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(STRVertex), (void *)(offsetof(STRVertex, couleur)));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(STRVertex), (void *)(offsetof(STRVertex, couleur)));
 
-    glBindVertexArray(0);
-    programID = LoadShaders("D:\\Documents\\Code\\synth_tp\\synth_tp7\\SimpleVertexShader.vertexshader", "D:\\Documents\\Code\\synth_tp\\synth_tp7\\SimpleFragmentShader.fragmentshader");
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
 
-    Projection = perspective(90.0f, 600.0f / 600.0f, 0.1f, 100.0f);
-    View = lookAt(vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0));
-    Model = mat4(1.0f);
-    //        Model = translate(Model,vec3(-1.0f, 0.0f, 0.0f));
-    //        Model = scale(Model,vec3(2.5f, 1.0f ,1.0f));
-    //Model = rotate(Model,radians(45.0f),vec3(0.0f,0.0f,1.0f));
-    //
-    MVP = Projection * View * Model;
-    MatrixID = glGetUniformLocation(programID, "MVP");
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    // render loop
+    // -----------
+    while (!glfwWindowShouldClose(window))
+    {
+        // input
+        // -----
+        processInput(window);
+        
+        // render
+        // ------
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    glutDisplayFunc(display);
-    glutKeyboardFunc(KeyPressed);
-    glutMotionFunc(MouseMotion);
+        // render the cube
+        ourShader.use();
 
-    glutMainLoop();
-    return (0);
+        // create transformations
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians((float) diffX), glm::vec3(0.0f, 0.0f, 1.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+        unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
+        unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
+
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
+
+        ourShader.setMat4("projection", projection);
+
+        glBindVertexArray(VAO);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, numPoints + 2);
+
+        // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+        // -------------------------------------------------------------------------------
+        //glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
+    // glfw: terminate, clearing all previously allocated GLFW resources.
+    // ------------------------------------------------------------------
+    glfwTerminate();
+    return 0;
+}
+
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow *window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+}
+
+static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
+{
+    diffX = xOld - xpos;
+    diffY = yOld - ypos;
+    glfwSwapBuffers(window);
+    xOld = xpos;
+    yOld = ypos;
+}
+
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_R && action == GLFW_PRESS)
+    {
+        glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glfwSwapBuffers(window);
+    }
+}
+
+// glfw: whenever the window size changed (by OS or user resize) this callback function executes
+// ---------------------------------------------------------------------------------------------
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+{
+    // make sure the viewport matches the new window dimensions; note that width and
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
 }
