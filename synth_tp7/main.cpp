@@ -21,9 +21,9 @@
 #include "camera.h"
 #include "math.h"
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void mouse_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
 // settings
@@ -37,7 +37,7 @@ float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
 // timing
-float deltaTime = 0.0f;	// time between current frame and last frame
+float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
 
 using namespace glm;
@@ -65,6 +65,7 @@ int main()
         glfwTerminate();
         return -1;
     }
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -87,56 +88,7 @@ int main()
 
     // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\shader.vs", "D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\shader.fs"); // you can name your shader files however you like
-
-    // float vertices[] = {
-    //     // positions          // colors
-    //     -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-    //     0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    //     0.5f, 0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-    //     0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
-    //     -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-    //     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-
-    //     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //     0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
-    //     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-    //     0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-    //     -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //     -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
-
-    //     -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-    //     -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    //     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-    //     -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
-    //     -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-    //     -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-
-    //     0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //     0.5f, 0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-    //     0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-    //     0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    //     0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 1.0f,
-    //     0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
-
-    //     -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-    //     0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-    //     0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 1.0f,
-    //     0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
-    //     -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-    //     -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-
-    //     -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-    //     0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
-    //     0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-    //     0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-    //     -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-    //     -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f
-    // };
-    // unsigned int indices[] = {
-    //     0, 1, 3, // first triangle
-    //     1, 2, 3  // second triangle
-    // };
+    Shader ourShader("D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\shader.vs", "D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\shader.fs");
 
     double pi = 3.14f, x, y;
     float radius = 0.5f;
@@ -144,23 +96,17 @@ int main()
     int numPoints = 50;
     int offset = numPoints + 2;
     float alternative = 1.0f;
-    STRVertex g_vertex_buffer_data[numPoints + 2];
+
+    STRVertex g_vertex_buffer_data[offset];
 
     g_vertex_buffer_data[0] = {vec3(radius, 0.0f, -height), vec3(1.0f, 0.0f, 0.0f)};
-    x = radius * cos(1 * 2 * pi / numPoints);
-    y = radius * sin(1 * 2 * pi / numPoints);
-    g_vertex_buffer_data[1] = {vec3(x, y, height), vec3(1.0f, 0.0f, 0.0f)};
-    x = radius * cos(2 * 2 * pi / numPoints);
-    y = radius * sin(2 * 2 * pi / numPoints);
-    g_vertex_buffer_data[2] = {vec3(x, y, -height), vec3(0.0f, 0.0f, 0.0f)};
-    for (int i = 3; i < offset; i++)
+    for (int i = 1; i < offset; i++)
     {
         x = radius * cos(i * 2 * pi / numPoints);
         y = radius * sin(i * 2 * pi / numPoints);
         g_vertex_buffer_data[i] = {vec3(x, y, alternative * height), vec3(0.0f, 0.0f, 0.0f)};
         alternative = -1 * alternative;
     }
-    //g_vertex_buffer_data[numPoints - 1] = g_vertex_buffer_data[1];
 
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -171,16 +117,13 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(STRVertex), (void *)(offsetof(STRVertex, couleur)));
     glEnableVertexAttribArray(1);
 
-	glClearColor(0.6f, 0.6f, 0.6f, 0.0f);
+    glClearColor(0.6f, 0.6f, 0.6f, 0.0f);
 
     // render loop
     // -----------
@@ -195,7 +138,7 @@ int main()
         // input
         // -----
         processInput(window);
-        
+
         // render
         // ------
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -215,21 +158,7 @@ int main()
         model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
         ourShader.setMat4("model", model);
 
-        // glm::mat4 view = glm::mat4(1.0f);
-        // glm::mat4 projection = glm::mat4(1.0f);
-        // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
-        // projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-
-        // unsigned int modelLoc = glGetUniformLocation(ourShader.ID, "model");
-        // unsigned int viewLoc = glGetUniformLocation(ourShader.ID, "view");
-
-        // glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        // glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-
-        // ourShader.setMat4("projection", projection);
-
         glBindVertexArray(VAO);
-        // glDrawArrays(GL_TRIANGLES, 0, 36);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, numPoints + 2);
 
@@ -268,17 +197,14 @@ void processInput(GLFWwindow *window)
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
 }
 
-
 // glfw: whenever the mouse moves, this callback is called
 // -------------------------------------------------------
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+void mouse_callback(GLFWwindow *window, double xpos, double ypos)
 {
     if (firstMouse)
     {
@@ -298,7 +224,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
 }
