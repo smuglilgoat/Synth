@@ -7,272 +7,265 @@
 #include <fstream>
 #include <algorithm>
 
-#include <GL/glew.h>
-#include <GL/freeglut.h>
-
 #include <stdlib.h>
 #include <string.h>
+
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include <cstddef>
-#include "shader.hpp"
-#include "math.h"
-
-int diffX, diffY, xOld, yOld;
+#include <math.h>
 
 using namespace std;
 
 GLuint LoadShaders(const char *vertex_file_path, const char *fragment_file_path)
 {
 
-    // Create the shaders
-    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+	// Create the shaders
+	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-    // Read the Vertex Shader code from the file
-    std::string VertexShaderCode;
-    std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-    if (VertexShaderStream.is_open())
-    {
-        std::string Line = "";
-        while (getline(VertexShaderStream, Line))
-            VertexShaderCode += "\n" + Line;
-        VertexShaderStream.close();
-    }
-    else
-    {
-        printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
-        getchar();
-        return 0;
-    }
+	// Read the Vertex Shader code from the file
+	std::string VertexShaderCode;
+	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+	if (VertexShaderStream.is_open())
+	{
+		std::string Line = "";
+		while (getline(VertexShaderStream, Line))
+			VertexShaderCode += "\n" + Line;
+		VertexShaderStream.close();
+	}
+	else
+	{
+		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
+		getchar();
+		return 0;
+	}
 
-    // Read the Fragment Shader code from the file
-    std::string FragmentShaderCode;
-    std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
-    if (FragmentShaderStream.is_open())
-    {
-        std::string Line = "";
-        while (getline(FragmentShaderStream, Line))
-            FragmentShaderCode += "\n" + Line;
-        FragmentShaderStream.close();
-    }
+	// Read the Fragment Shader code from the file
+	std::string FragmentShaderCode;
+	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+	if (FragmentShaderStream.is_open())
+	{
+		std::string Line = "";
+		while (getline(FragmentShaderStream, Line))
+			FragmentShaderCode += "\n" + Line;
+		FragmentShaderStream.close();
+	}
 
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
+	GLint Result = GL_FALSE;
+	int InfoLogLength;
 
-    // Compile Vertex Shader
-    printf("Compiling shader : %s\n", vertex_file_path);
-    char const *VertexSourcePointer = VertexShaderCode.c_str();
-    glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
-    glCompileShader(VertexShaderID);
+	// Compile Vertex Shader
+	printf("Compiling shader : %s\n", vertex_file_path);
+	char const *VertexSourcePointer = VertexShaderCode.c_str();
+	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
+	glCompileShader(VertexShaderID);
 
-    // Check Vertex Shader
-    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-    glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0)
-    {
-        std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-        glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-        printf("%s\n", &VertexShaderErrorMessage[0]);
-    }
+	// Check Vertex Shader
+	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if (InfoLogLength > 0)
+	{
+		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
+		glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+		printf("%s\n", &VertexShaderErrorMessage[0]);
+	}
 
-    // Compile Fragment Shader
-    printf("Compiling shader : %s\n", fragment_file_path);
-    char const *FragmentSourcePointer = FragmentShaderCode.c_str();
-    glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
-    glCompileShader(FragmentShaderID);
+	// Compile Fragment Shader
+	printf("Compiling shader : %s\n", fragment_file_path);
+	char const *FragmentSourcePointer = FragmentShaderCode.c_str();
+	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
+	glCompileShader(FragmentShaderID);
 
-    // Check Fragment Shader
-    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-    glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0)
-    {
-        std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-        glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-        printf("%s\n", &FragmentShaderErrorMessage[0]);
-    }
+	// Check Fragment Shader
+	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if (InfoLogLength > 0)
+	{
+		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
+		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+		printf("%s\n", &FragmentShaderErrorMessage[0]);
+	}
 
-    // Link the program
-    printf("Linking program\n");
-    GLuint ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, VertexShaderID);
-    glAttachShader(ProgramID, FragmentShaderID);
-    glLinkProgram(ProgramID);
+	// Link the program
+	printf("Linking program\n");
+	GLuint ProgramID = glCreateProgram();
+	glAttachShader(ProgramID, VertexShaderID);
+	glAttachShader(ProgramID, FragmentShaderID);
+	glLinkProgram(ProgramID);
 
-    // Check the program
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0)
-    {
-        std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-        printf("%s\n", &ProgramErrorMessage[0]);
-    }
+	// Check the program
+	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+	if (InfoLogLength > 0)
+	{
+		std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
+		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+		printf("%s\n", &ProgramErrorMessage[0]);
+	}
 
-    glDeleteShader(VertexShaderID);
-    glDeleteShader(FragmentShaderID);
+	glDeleteShader(VertexShaderID);
+	glDeleteShader(FragmentShaderID);
 
-    return ProgramID;
+	return ProgramID;
 }
+
 using namespace glm;
-
-GLuint VAOID;
-GLuint VBOID;
-GLuint IBO;
-
-GLuint programID;
-mat4 MVP;
-GLuint MatrixID;
-
-mat4 Projection;
-mat4 Model;
-mat4 View;
-
-int numPoints = 20;
 
 struct STRVertex
 {
-    vec3 position;
-    vec3 couleur;
+	vec3 position;
+	vec3 couleur;
 };
 
-void ExitFunction(int value)
-{
-    glDeleteBuffers(1, &VBOID);
-    glDeleteVertexArrays(1, &VAOID);
-}
+GLuint VAOID;
+GLuint VBOID;
+GLuint programID;
+GLuint MatrixID;
+GLuint IBOID;
+mat4 MVP;
+mat4 View;
+mat4 Model;
+mat4 Projection;
+float zoom = 2.0f;
 
-void MouseMotion(int x, int y)
+void display()
 {
-    diffX = xOld - x;
-    diffY = yOld - y;
-    glutPostRedisplay();
-    xOld = x;
-    yOld = y;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glUseProgram(programID);
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+	glEnableVertexAttribArray(0);
+	// Draw the shape
+	//glVertexAttribPointer(glEnableVertexAttribArray(index), elements_to_take, type, normalized , step, first_element_offset);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+	//Color the shape
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)(sizeof(float) * 3));
+	//glDrawArrays(mode,first_element, size_g_vertex_buffer_data);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 102);
+	glDisableVertexAttribArray(0);
+	glutSwapBuffers();
 }
 
 void KeyPressed(unsigned char touche, int x, int y)
 {
-    switch (touche)
-    {
-    case 'r':
-        glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        break;
-    case 'b':
-        glClearColor(0.0f, 0.0f, 1.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        break;
-    case 'v':
-        glClearColor(0.0f, 1.0f, 0.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        break;
-    case 27: /* Escape */
-        exit(0);
-        break;
-    default:
-        glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT);
-    }
-    glutPostRedisplay(); /// cette instruction va forcer glut à rafraîchir l’affichage.
+	float step = 0.05f;
+	switch (touche)
+	{
+	case 'w':
+		zoom = zoom + step;
+		break;
+	case 's':
+		zoom = zoom - step;
+		break;
+	case 27: //ESC
+		exit(0);
+		break;
+	default:
+		glClearColor(0.6f, 0.6f, 0.6f, 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+	View = lookAt(vec3(zoom, zoom, zoom), vec3(0, 0, 0), vec3(0, 1, 0));
+	Model = mat4(1.0f);
+	Model = rotate(Model, radians(270.0f), vec3(1.0f, 0.0f, 0.0f));
+	Projection = perspective(radians(45.0f), 1.0f, 0.1f, 100.0f);
+	MVP = Projection * View * Model;
+	MatrixID = glGetUniformLocation(programID, "MVP");
+	glClear(GL_COLOR_BUFFER_BIT);
+	glutPostRedisplay();
 }
-
-void display(void)
+void ExitFunction(int value)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glUseProgram(programID);
-
-    Model = rotate(Model, radians(float(diffX)), vec3(0.0f, 0.0f, 1.0f));
-    //
-    MVP = Projection * View * Model;
-
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
-    glBindVertexArray(VAOID);
-    //  glDrawArrays(GL_TRIANGLES, 0, 18);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, numPoints + 2);
-    glBindVertexArray(0);
-
-    glutSwapBuffers();
+	glDeleteBuffers(1, &VBOID);
+	glDeleteVertexArrays(1, &VAOID);
 }
 
 int main(int argc, char **argv)
 {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(600, 600);
-    glutInitWindowPosition(80, 100);
-    glutInitContextVersion(3, 3);
-    glutInitContextFlags(GLUT_CORE_PROFILE);
-    __glutCreateWindowWithExit("TP OpenGL", ExitFunction);
-    glewExperimental = TRUE;
-    if (glewInit())
-    {
-        cerr << "Unable to initialize GLEW ... exiting" << endl;
-        exit(EXIT_FAILURE);
-    }
+	glutInit(&argc, argv);
 
-    glGenVertexArrays(1, &VAOID);
-    glBindVertexArray(VAOID);
-    glGenBuffers(1, &VBOID);
-    glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+	glutInitDisplayMode(GLUT_DEPTH);
+	glutInitWindowSize(600, 600);
+	glutInitWindowPosition(100, 100);
+	glutInitContextVersion(3, 3);
+	glutInitContextFlags(GLUT_CORE_PROFILE);
+	__glutCreateWindowWithExit("TP7 Synthese d'image", ExitFunction);
 
-    ////
-    double pi = 3.14, x, y;
-    float rayon = 2;
+	glewExperimental = TRUE;
+	if (glewInit() != GLEW_OK)
+	{
+		exit(EXIT_FAILURE);
+	}
 
-    int indice = 1;
+	glGenVertexArrays(1, &VAOID);
+	glBindVertexArray(VAOID);
 
-    STRVertex g_vertex_buffer_data[numPoints + 2];
+	glGenBuffers(1, &VBOID);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOID);
 
-    g_vertex_buffer_data[0] = {vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 1.0f)};
+	double pi = 3.14f, x, y;
+	float radius = 0.5f;
+	float height = 0.8f;
+	int numPoints = 100;
+	int offset = numPoints + 2;
+	float alternative = 1.0f;
+	STRVertex g_vertex_buffer_data[(numPoints + 3)];
 
-    for (int i = 0; i < numPoints; i++)
-    {
-        x = rayon * cos(i * 2 * pi / numPoints);
-        y = rayon * sin(i * 2 * pi / numPoints);
-        g_vertex_buffer_data[indice] = {vec3(x, y, 0.0f), vec3(0.0f, 0.0f, 1.0f)};
-        indice++;
-    }
+	g_vertex_buffer_data[0] = {vec3(radius, 0.0f, -height), vec3(0.0f, 0.0f, 0.0f)};
+	x = radius * cos(1 * 2 * pi / numPoints);
+	y = radius * sin(1 * 2 * pi / numPoints);
+	g_vertex_buffer_data[1] = {vec3(x, y, height), vec3(0.0f, 0.0f, 0.0f)};
+	x = radius * cos(2 * 2 * pi / numPoints);
+	y = radius * sin(2 * 2 * pi / numPoints);
+	g_vertex_buffer_data[2] = {vec3(x, y, -height), vec3(0.0f, 0.0f, 0.0f)};
+	for (int i = 3; i < numPoints; i++)
+	{
+		x = radius * cos(i * 2 * pi / numPoints);
+		y = radius * sin(i * 2 * pi / numPoints);
+		g_vertex_buffer_data[i] = {vec3(x, y, alternative * height), vec3(0.0f, 0.0f, 0.0f)};
+		alternative = -1 * alternative;
+	}
+	g_vertex_buffer_data[100] = g_vertex_buffer_data[1];
 
-    g_vertex_buffer_data[indice] = g_vertex_buffer_data[1];
+	// circle code ;
+	// g_vertex_buffer_data[0] = {vec3(0.0f, -0.f, 0.0f), vec3(0.0f, 0.0f, 1.0f)};
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	// for (int i = 0; i < numPoints; i++)
+	// {
+	// 	x = rayon * cos(i * 2 * pi / numPoints);
+	// 	y = rayon * sin(i * 2 * pi / numPoints);
+	// 	g_vertex_buffer_data[i + 1] = {vec3(x, y, -0.5f), vec3(0.0f, 0.0f, 1.0f)};
+	// }
+	// g_vertex_buffer_data[numPoints + 1] = {vec3(rayon, 0.0f, -0.5f), vec3(0.0f, 0.0f, 1.0f)};
 
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36*sizeof(unsigned int), vertex_index,GL_STATIC_DRAW);
+	// g_vertex_buffer_data[0] = {vec3(0.0f, -0.f, 0.0f), vec3(0.0f, 0.0f, 1.0f)};
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void *)0);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(STRVertex), (void *)(offsetof(STRVertex, couleur)));
+	//Modifier le path
 
-    glBindVertexArray(0);
-    programID = LoadShaders("D:\\Documents\\Code\\synth_tp\\synth_tp7\\SimpleVertexShader.vertexshader", "D:\\Documents\\Code\\synth_tp\\synth_tp7\\SimpleFragmentShader.fragmentshader");
+	programID = LoadShaders("D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\SimpleVertexShader.vertexshader", "D:\\Documents\\Code\\synth_tp\\synth_tp7\\shaders\\SimpleFragmentShader.fragmentshad"); // you can name your shader files however you like
 
-    Projection = perspective(45.0f, 800.0f / 600.0f, 0.1f, 100.0f);
-    View = lookAt(vec3(0, 100, 0), vec3(0, 0, 0), vec3(0, 1, 0));
-    Model = mat4(1.0f);
-    //        Model = translate(Model,vec3(-1.0f, 0.0f, 0.0f));
-    //        Model = scale(Model,vec3(2.5f, 1.0f ,1.0f));
-    //Model = rotate(Model,radians(45.0f),vec3(0.0f,0.0f,1.0f));
-    //
-    MVP = Projection * View * Model;
-    MatrixID = glGetUniformLocation(programID, "MVP");
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+	View = lookAt(vec3(zoom, zoom, zoom), vec3(0, 0, 0), vec3(0, 1, 0));
+	Model = mat4(1.0f);
+	Model = rotate(Model, radians(270.0f), vec3(1.0f, 0.0f, 0.0f));
+	Projection = perspective(radians(45.0f), 1.0f, 0.1f, 100.0f);
 
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    glutDisplayFunc(display);
-    glutKeyboardFunc(KeyPressed);
-    glutMotionFunc(MouseMotion);
+	MVP = Projection * View * Model;
+	MatrixID = glGetUniformLocation(programID, "MVP");
 
-    glutMainLoop();
-    return (0);
+	glutDisplayFunc(display);
+	glutIdleFunc(display);
+	glutKeyboardFunc(KeyPressed);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glClearColor(0.6f, 0.6f, 0.6f, 0.0f);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glutMainLoop();
+	return (0);
 }
