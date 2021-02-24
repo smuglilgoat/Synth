@@ -137,12 +137,21 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
 
+        glBindVertexArray(VAO);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(1.0f, 1.0f, 1.0f));
         ourShader.setMat4("model", model);
 
-        glBindVertexArray(VAO);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, numPoints + 2);
+
+        model = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime() *  glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ourShader.setMat4("model", model);
+
+        
         glDrawArrays(GL_TRIANGLE_STRIP, 0, numPoints + 2);
 
         glfwSwapBuffers(window);
