@@ -44,7 +44,8 @@
         "ctime": "cpp",
         "functional": "cpp",
         "iterator": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "map": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "C_Cpp.dimInactiveRegions": true

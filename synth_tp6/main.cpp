@@ -9,6 +9,8 @@
 #include "shader_m.h"
 
 #include <iostream>
+#include <vector>
+#include <array>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -54,72 +56,79 @@ int main()
     // ------------------------------------
     Shader ourShader("D:\\Documents\\Code\\synth_tp\\synth_tp6\\shaders\\shader.vs", "D:\\Documents\\Code\\synth_tp\\synth_tp6\\shaders\\shader.fs"); // you can name your shader files however you like
 
-    float vertices[] = {
+    float vertices[6][36] = {
         // positions          // colors
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, -0.5f,  0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
- 
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 
-        -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+        {-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+         0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+         0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
+         -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+         -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f},
 
-        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 
-        -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
- 
-        0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+        {-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+         0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+         0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+         0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+         -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+         -0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f},
 
-        -0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-        0.5f, -0.5f, 0.5f,  0.0f, 0.0f, 1.0f,
-        0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
- 
-        -0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
-        0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f
-    };
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
+        {-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+         -0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
+         -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+         -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f},
 
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    glBindVertexArray(VAO);
+        {0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+         0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+         0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f},
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        {-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+         0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+         0.5f, -0.5f, 0.5f, 1.0f, 1.0f, 0.0f,
+         -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+         -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f},
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+        {-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f,
+         0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f,
+         0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
+         0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
+         -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+         -0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f}};
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
+    // unsigned int VBO, VAO;
+    // glGenVertexArrays(1, &VAO);
+    // glGenBuffers(1, &VBO);
+    // glBindVertexArray(VAO);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    // glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+    // glEnableVertexAttribArray(0);
+
+    // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    // glEnableVertexAttribArray(1);
+    std::array<GLuint, 6> VAOs;
+    std::array<GLuint, 6> VBOs;
+
+    glGenVertexArrays(VAOs.size(), &VAOs[0]);
+    glGenBuffers(VBOs.size(), &VBOs[0]);
+
+    for (int i = 0; i < 6; i++)
+    {
+        glBindVertexArray(VAOs[i]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBOs[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[i]), vertices[i], GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+    }
 
     // render loop
     // -----------
@@ -153,8 +162,14 @@ int main()
 
         ourShader.setMat4("projection", projection);
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for (int i = 0; i < 6; i++)
+        {
+            glBindVertexArray(VAOs[i]);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+
+        // glBindVertexArray(VAO);
+        // glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -162,9 +177,8 @@ int main()
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    // glDeleteVertexArrays(1, &VAO);
+    // glDeleteBuffers(1, &VBO);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
