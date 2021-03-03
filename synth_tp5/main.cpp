@@ -182,6 +182,7 @@ int main(int argc, char **argv)
     Model = rotate(Model,radians(45.0f),vec3(0.0f,0.0f,1.0f));
 
     MVP = Projection * View * Model;
+	
     MatrixID = glGetUniformLocation(programID, "MVP");
     
     glutDisplayFunc(display);
