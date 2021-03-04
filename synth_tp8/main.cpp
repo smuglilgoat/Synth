@@ -193,7 +193,7 @@ int main()
     }
     
     ourShader.use();
-    ourShader.setInt("texture1", 0);
+    ourShader.setInt("tex", 0);
 
     while (!glfwWindowShouldClose(window))
     {
